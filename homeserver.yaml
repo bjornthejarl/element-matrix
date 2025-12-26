@@ -1,0 +1,72 @@
+server_name: "{{ MATRIX_SERVER_NAME }}"
+pid_file: /app/homeserver.pid
+public_baseurl: "https://{{ MATRIX_SERVER_NAME }}/"
+
+listeners:
+  - port: 8008
+    tls: false
+    type: http
+    x_forwarded: true
+    bind_addresses: ['0.0.0.0']
+    resources:
+      - names: [client, federation]
+        compress: false
+      - names: [static]
+        compress: false
+        path: /app/element-web
+        fallback_resource: true
+
+  - port: 8448
+    tls: false
+    type: http
+    x_forwarded: true
+    bind_addresses: ['0.0.0.0']
+    resources:
+      - names: [federation]
+        compress: false
+
+database:
+  name: psycopg2
+  txn_limit: 10000
+  args:
+    user: "{{ POSTGRES_USER }}"
+    password: "{{ POSTGRES_PASSWORD }}"
+    database: "{{ POSTGRES_DB }}"
+    host: "{{ POSTGRES_HOST }}"
+    port: 5432
+    cp_min: 5
+    cp_max: 10
+
+enable_registration: true
+enable_registration_without_verification: false
+registration_shared_secret: "{{ SYNAPSE_REGISTRATION_SHARED_SECRET }}"
+registration_requires_token: false
+
+macaroon_secret_key: "{{ SYNAPSE_MACAROON_SECRET_KEY }}"
+form_secret: "{{ SYNAPSE_FORM_SECRET }}"
+signing_key:
+  - "ed25519 {{ SYNAPSE_SIGNING_KEY }}"
+
+trusted_key_servers:
+  - server_name: "matrix.org"
+
+presence:
+  enabled: true
+
+# LiveKit & Turn (WebRTC)
+turn_uris:
+  - "turn:{{ RTC_DOMAIN }}:3478?transport=udp"
+  - "turn:{{ RTC_DOMAIN }}:3478?transport=tcp"
+turn_shared_secret: "{{ TURN_SHARED_SECRET }}"
+turn_user_lifetime: 86400000
+turn_allow_guests: true
+
+experimental_features:
+  msc3981:
+    enabled: true
+
+# Media
+media_store_path: /app/media_store
+uploads_path: /app/uploads
+max_upload_size: 100M
+url_preview_enabled: true

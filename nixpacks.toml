@@ -1,0 +1,14 @@
+[phases.setup]
+nixPkgs = ["python311", "gcc", "openssl", "libffi", "postgresql", "wget", "tar", "bash"]
+
+[phases.install]
+cmds = [
+    "pip install -r requirements.txt",
+    "mkdir -p /app/element-web",
+    "wget -O element.tar.gz https://github.com/element-hq/element-web/releases/download/v1.11.87/element-v1.11.87.tar.gz",
+    "tar -xzf element.tar.gz -C /app/element-web --strip-components=1",
+    "rm element.tar.gz"
+]
+
+[start]
+cmd = "./start.sh"
