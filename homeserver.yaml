@@ -1,5 +1,6 @@
 server_name: "{{ MATRIX_SERVER_NAME }}"
 pid_file: /data/homeserver.pid
+report_stats: false
 public_baseurl: "https://{{ MATRIX_SERVER_NAME }}/"
 
 listeners:
