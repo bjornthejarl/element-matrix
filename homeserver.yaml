@@ -1,5 +1,5 @@
 server_name: "{{ MATRIX_SERVER_NAME }}"
-pid_file: /app/homeserver.pid
+pid_file: /data/homeserver.pid
 public_baseurl: "https://{{ MATRIX_SERVER_NAME }}/"
 
 listeners:
@@ -11,19 +11,6 @@ listeners:
     resources:
       - names: [client, federation]
         compress: false
-      - names: [static]
-        compress: false
-        path: /app/element-web
-        fallback_resource: true
-
-  - port: 8448
-    tls: false
-    type: http
-    x_forwarded: true
-    bind_addresses: ['0.0.0.0']
-    resources:
-      - names: [federation]
-        compress: false
 
 database:
   name: psycopg2
@@ -32,7 +19,7 @@ database:
     user: "{{ POSTGRES_USER }}"
     password: "{{ POSTGRES_PASSWORD }}"
     database: "{{ POSTGRES_DB }}"
-    host: "{{ POSTGRES_HOST }}"
+    host: "postgres"
     port: 5432
     cp_min: 5
     cp_max: 10
@@ -50,9 +37,6 @@ signing_key:
 trusted_key_servers:
   - server_name: "matrix.org"
 
-presence:
-  enabled: true
-
 # LiveKit & Turn (WebRTC)
 turn_uris:
   - "turn:{{ RTC_DOMAIN }}:3478?transport=udp"
@@ -66,7 +50,7 @@ experimental_features:
     enabled: true
 
 # Media
-media_store_path: /app/media_store
-uploads_path: /app/uploads
+media_store_path: /data/media_store
+uploads_path: /data/uploads
 max_upload_size: 100M
 url_preview_enabled: true
