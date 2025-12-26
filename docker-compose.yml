@@ -80,6 +80,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./element-config.json:/app/config.json
+      - ./element-config.json:/app/config.jpmxruytgigenavmmqwwoo.valpha.dev.json
     networks:
       - dokploy-network
     labels:
