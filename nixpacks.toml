@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["python311", "gcc", "openssl", "libffi", "postgresql", "wget", "tar", "bash"]
+nixPkgs = ["python311", "gcc", "openssl", "libffi", "postgresql", "wget", "gnutar", "bash"]
 
 [phases.install]
 cmds = [
