@@ -72,10 +72,11 @@ services:
     labels:
       - "traefik.enable=true"
       # Route /_matrix, /_synapse, and /_client to Synapse (federation + client api)
-      - "traefik.http.routers.synapse.rule=Host(`${MATRIX_SERVER_NAME}`) && (PathPrefix(`/_matrix`) || PathPrefix(`/_synapse`))"
-      - "traefik.http.routers.synapse.entrypoints=websecure"
-      - "traefik.http.routers.synapse.tls.certresolver=letsencrypt"
-      - "traefik.http.services.synapse.loadbalancer.server.port=8008"
+      - "traefik.http.routers.valpha_synapse.rule=Host(`${MATRIX_SERVER_NAME}`) && (PathPrefix(`/_matrix`) || PathPrefix(`/_synapse`))"
+      - "traefik.http.routers.valpha_synapse.entrypoints=websecure"
+      - "traefik.http.routers.valpha_synapse.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.valpha_synapse.service=valpha_synapse"
+      - "traefik.http.services.valpha_synapse.loadbalancer.server.port=8008"
 
   element:
     image: vectorim/element-web:latest
@@ -88,10 +89,11 @@ services:
     labels:
       - "traefik.enable=true"
       # Route everything else to Element
-      - "traefik.http.routers.element.rule=Host(`${MATRIX_SERVER_NAME}`)"
-      - "traefik.http.routers.element.entrypoints=websecure"
-      - "traefik.http.routers.element.tls.certresolver=letsencrypt"
-      - "traefik.http.services.element.loadbalancer.server.port=80"
+      - "traefik.http.routers.valpha_element.rule=Host(`${MATRIX_SERVER_NAME}`)"
+      - "traefik.http.routers.valpha_element.entrypoints=websecure"
+      - "traefik.http.routers.valpha_element.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.valpha_element.service=valpha_element"
+      - "traefik.http.services.valpha_element.loadbalancer.server.port=80"
 
 volumes:
   postgres_data_v2:
