@@ -3,8 +3,8 @@ nixPkgs = ["python311", "gcc", "openssl", "libffi", "postgresql", "wget", "gnuta
 
 [phases.install]
 cmds = [
-    "python -m ensurepip",
-    "python -m pip install -r requirements.txt",
+    "python -m venv /opt/venv",
+    "/opt/venv/bin/pip install -r requirements.txt",
     "mkdir -p /app/element-web",
     "wget -O element.tar.gz https://github.com/element-hq/element-web/releases/download/v1.11.87/element-v1.11.87.tar.gz",
     "tar -xzf element.tar.gz -C /app/element-web --strip-components=1",
@@ -12,4 +12,4 @@ cmds = [
 ]
 
 [start]
-cmd = "./start.sh"
+cmd = "PATH=/opt/venv/bin:$PATH ./start.sh"
