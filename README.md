@@ -8,6 +8,8 @@ This repository is configured to deploy a Matrix homeserver (Synapse) and Elemen
 2. **Deployment Method**: Select **Docker Compose**.
 3. **Connect Repository**: Link this repository (`https://github.com/bjornthejarl/element-matrix.git`).
 4. **Environment Variables**: Add the following variables in the Dokploy Environment tab:
+   
+   > **Note on Port**: If Dokploy asks for an application port, set it to **80** (This points to the Element frontend). Traefik handles the rest.
 
 ```env
 # Domain Settings
