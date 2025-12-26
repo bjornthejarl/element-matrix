@@ -12,28 +12,64 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - dokploy-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   synapse:
     image: matrixdotorg/synapse:latest
     restart: unless-stopped
     environment:
-      SYNAPSE_SERVER_NAME: ${MATRIX_SERVER_NAME}
+      # These are used by our inline renderer script
+      MATRIX_SERVER_NAME: ${MATRIX_SERVER_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: postgres
+      SYNAPSE_REGISTRATION_SHARED_SECRET: ${SYNAPSE_REGISTRATION_SHARED_SECRET}
+      SYNAPSE_MACAROON_SECRET_KEY: ${SYNAPSE_MACAROON_SECRET_KEY}
+      SYNAPSE_FORM_SECRET: ${SYNAPSE_FORM_SECRET}
+      # The signing key usually needs 'ed25519 ' prefix in the config
+      SYNAPSE_SIGNING_KEY: ${SYNAPSE_SIGNING_KEY}
+      RTC_DOMAIN: ${RTC_DOMAIN}
+      TURN_SHARED_SECRET: ${TURN_SHARED_SECRET}
+      # Standard Synapse vars
       SYNAPSE_REPORT_STATS: "no"
       SYNAPSE_CONFIG_DIR: /data
       SYNAPSE_CONFIG_PATH: /data/homeserver.yaml
-      # Pass database connection info to generate config if needed, or rely on mounted config
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - synapse_data:/data
-      # Mount the generated homeserver.yaml
-      - ./homeserver.yaml:/data/homeserver.yaml
+      # Mount as template
+      - ./homeserver.yaml:/data/homeserver.yaml.template
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - dokploy-network
+    entrypoint:
+      - sh
+      - -c
+      - |
+        echo "Rendering configuration..."
+        python3 -c "
+        import os
+        try:
+            with open('/data/homeserver.yaml.template') as f:
+                t = f.read()
+            for k, v in os.environ.items():
+                t = t.replace('{{ ' + k + ' }}', v)
+            with open('/data/homeserver.yaml', 'w') as f:
+                f.write(t)
+            print('Config generated successfully.')
+        except Exception as e:
+            print(f'Error generating config: {e}')
+        "
+        exec /start.py
     labels:
       - "traefik.enable=true"
-      # Route /_matrix and /_synapse to Synapse
+      # Route /_matrix, /_synapse, and /_client to Synapse (federation + client api)
       - "traefik.http.routers.synapse.rule=Host(`${MATRIX_SERVER_NAME}`) && (PathPrefix(`/_matrix`) || PathPrefix(`/_synapse`))"
       - "traefik.http.routers.synapse.entrypoints=websecure"
       - "traefik.http.routers.synapse.tls.certresolver=letsencrypt"
@@ -48,7 +84,7 @@ services:
       - dokploy-network
     labels:
       - "traefik.enable=true"
-      # Route root to Element
+      # Route everything else to Element
       - "traefik.http.routers.element.rule=Host(`${MATRIX_SERVER_NAME}`)"
       - "traefik.http.routers.element.entrypoints=websecure"
       - "traefik.http.routers.element.tls.certresolver=letsencrypt"
