@@ -52,6 +52,8 @@ services:
       - sh
       - -c
       - |
+        echo "Fixing permissions..."
+        chown -R 991:991 /data
         echo "Rendering configuration..."
         python3 -c "
         import os
