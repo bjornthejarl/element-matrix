@@ -23,11 +23,8 @@
         "https://scalar-staging.riot.im/scalar/api"
     ],
     "features": {
-        "feature_video_rooms": true,
-        "feature_group_calls": true,
-        "feature_element_call_video_rooms": true
-    },
-    "livekit": {
-        "livekit_service_url": "wss://valpha-8gwvtpe4.livekit.cloud"
+        "feature_video_rooms": false,
+        "feature_group_calls": false,
+        "feature_element_call_video_rooms": false
     }
 }
