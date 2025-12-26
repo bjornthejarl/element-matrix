@@ -15,9 +15,9 @@ def generate_signing_key():
     # Generate 32 bytes of random data for the key
     key_bytes = secrets.token_bytes(32)
     # Encode as base64 and STRIP PADDING '='
-    # 32 bytes -> 43 chars (approx) when unpadded
+    # 32 bytes -> 43 chars    # Synapse uses unpadded URL-safe base64
     key_b64 = base64.urlsafe_b64encode(key_bytes).decode('utf-8').rstrip('=')
-    return f"ed25519 a_{key_b64}" 
+    return f"ed25519 a_0 {key_b64}" 
 
 def main():
     print(f"# --- COPY BELOW THIS LINE TO DOKPLOY ---")

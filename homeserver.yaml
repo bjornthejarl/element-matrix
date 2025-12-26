@@ -32,7 +32,7 @@ registration_requires_token: false
 
 macaroon_secret_key: "{{ SYNAPSE_MACAROON_SECRET_KEY }}"
 form_secret: "{{ SYNAPSE_FORM_SECRET }}"
-signing_key: "ed25519 {{ SYNAPSE_SIGNING_KEY }}"
+signing_key: "{{ SYNAPSE_SIGNING_KEY }}"
 
 trusted_key_servers:
   - server_name: "matrix.org"
