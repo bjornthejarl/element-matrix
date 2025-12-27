@@ -78,6 +78,32 @@ services:
       - "traefik.http.routers.valpha_synapse.service=valpha_synapse"
       - "traefik.http.services.valpha_synapse.loadbalancer.server.port=8008"
 
+  coturn:
+    image: instrumentisto/coturn:latest
+    restart: unless-stopped
+    ports:
+      - "3478:3478/tcp"
+      - "3478:3478/udp"
+      - "5349:5349/tcp"
+      - "5349:5349/udp"
+      - "49152-49172:49152-49172/udp"
+    environment:
+      # We just use the static auth secret from environment
+      # This image supports configuring via env vars or cmd flags.
+      # Commonly used vars for this image:
+      TURNSERVER_REALM: ${RTC_DOMAIN}
+      TURNSERVER_STATIC_AUTH_SECRET: ${TURN_SHARED_SECRET}
+      # Listen on all interfaces
+      TURNSERVER_LISTENING_IP: "0.0.0.0"
+      # External IP is auto-detected usually, or can be forced if needed.
+      # For AWS/Oracle, 0.0.0.0 often works if NAT is handled correctly, 
+      # but sometimes TURNSERVER_EXTERNAL_IP is needed if behind robust 1:1 NAT. 
+      # We'll start simple.
+      TURNSERVER_MIN_PORT: 49152
+      TURNSERVER_MAX_PORT: 49172
+    networks:
+      - dokploy-network
+
   element:
     image: vectorim/element-web:latest
     restart: unless-stopped
